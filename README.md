@@ -5,6 +5,7 @@ I created this software while working on the (german) Agearena AddOn (http://www
 -- USAGE --
 
 > AoEAgePatchStandalone.exe PARAMS
+
 PARAMS is the usual call to the Age of Empires process, e.g.: age2_x1.exe nostartup
 
 For mod developers using their own Games/[MODNAME] subfolder, the call may be: 
@@ -14,6 +15,8 @@ For mod developers using their own Games/[MODNAME] subfolder, the call may be:
 -- SYSTEM REQUIREMENTS --
 
 As this software is build with Microsoft Visual Studio 2013, you'll need the appropiate Visual C++ redistributable: http://www.microsoft.com/en-us/download/details.aspx?id=40784
+
+This software overwrites some routines the UserPatch v1.4 creates, so that is required (see http://userpatch.aiscripters.net/).
 
 Also some virus scanners may have problems with this software, as it uses DLL injection to patch the running Age of Empires II process. This method is also used by many viruses, so some virus scanners block it by default. If you have problems running this software, try to create an exception in the scanners filter rules.
 
