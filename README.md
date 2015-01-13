@@ -30,11 +30,11 @@ To use this patch you'll have to ensure the following things (example: new age "
 - #4207: The title of the new post-age (e.g. "Post-Renaissance")
 - #7104: The title of the new age (e.g. "Renaissance")
 - #7105: The name of the dark age (e.g. "Dark Age")
-- #11265: The abbreviation of dark age for "starting age - maximum age" selection (e.g. "Dark")
-- #11266: The abbreviation of feudal age for "starting age - maximum age" selection (e.g. "Feudal")
-- #11267: The abbreviation of castle age for "starting age - maximum age" selection (e.g. "Castle")
-- #11268: The abbreviation of imperial age for "starting age - maximum age" selection (e.g. "Imperial")
-- #11269: The abbreviation of your new age for "starting age - maximum age" selection (e.g. "Renaissance")
+- #11365: The abbreviation of dark age for "starting age - maximum age" selection (e.g. "Dark")
+- #11366: The abbreviation of feudal age for "starting age - maximum age" selection (e.g. "Feudal")
+- #11367: The abbreviation of castle age for "starting age - maximum age" selection (e.g. "Castle")
+- #11368: The abbreviation of imperial age for "starting age - maximum age" selection (e.g. "Imperial")
+- #11369: The abbreviation of your new age for "starting age - maximum age" selection (e.g. "Renaissance")
 
 -> language_x1.dll IDs
 - #3039: The age advancement message for your new age with '%s' player name parameter (e.g. "%s advanced to the Renaissance.")
