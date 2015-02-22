@@ -49,8 +49,7 @@ When you considered these changes, it should work fine. If I forgot something, c
 
 -- TODO --
 
-I'll try to translate the source code comments little by little, but it will take some time.
-Also the patches aren't perfect yet: The techtree functions aren't changed, and there may still be a few bugs. These features probably will be added in some time.
+The patches aren't perfect yet: The techtree functions aren't changed, and there may still be a few bugs. These features probably will be added in some time.
 
 
 -- LEGAL INFO & CREDITS --
