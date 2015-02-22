@@ -1,355 +1,342 @@
 #pragma once
 /*
---- AOE AGE PATCH :: INJECTION-CODE ---
+--- AOE AGE PATCH :: INJECTION CODE ---
 */
 
 /* INCLUDES */
 
-// Windows-Funktionen
+// Windows definitions
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-// C-Standard-I/O-Funktionen
+// C standard I/O functions
 #include <cstdio>
 
 
 /* MAKROS */
 
-// Maximale Stringlänge.
-// Hier die maximale Pfadlänge, da primär Pfade übergeben werden.
+// Maximum string length.
 #define MAX_STRING_LENGTH MAX_PATH
 
 
 /* FUNKTIONEN */
 
-// Lädt die angegebene DLL-Funktion in den gegebenen Prozess und führt diese aus.
-// Parameter:
-// -> process: Der Prozess, bei dem die DLL-Injection durchgeführt werden soll.
-// -> dllPath: Der Pfad zur DLL-Datei, die in den Prozess geladen werden soll.
-// -> dllFunc: Die DLL-Funktion, die ausgeführt werden soll, sobald die DLL geladen wurde (Initialisierung).
+// Loads the given DLL function into the given process and runs it in its context.
+// Parameters:
+// -> process: The process to inject the DLL into.
+// -> dllPath: The path to the DLL being injected.
+// -> dllFunc: The DLL initialization function to be run after successful injection.
 void InjectDLL(HANDLE process, const char* dllPath, const char* dllFunc)
 {
-	// Pfad zur Inject-DLL
+	// Path to DLL
 	DWORD addrInjectDLLPath = 0;
 	char injectDLLPath[MAX_STRING_LENGTH + 1] = { 0 };
 	_snprintf_s(injectDLLPath, MAX_STRING_LENGTH + 1, MAX_STRING_LENGTH, "%s", dllPath);
 
-	// Initialisierungsfunktion der Inject-DLL
+	// DLL initialization function
 	DWORD addrInjectDLLFunc = 0;
 	char injectDLLFunc[MAX_STRING_LENGTH + 1] = { 0 };
 	_snprintf_s(injectDLLFunc, MAX_STRING_LENGTH + 1, MAX_STRING_LENGTH, "%s", dllFunc);
 
-	// Titel der Fehlermeldungs-Fenster
+	// Error message box title
 	DWORD addrInjectErrorTitle = 0;
 	char injectErrorTitle[MAX_STRING_LENGTH + 1] = { 0 };
 	_snprintf_s(injectErrorTitle, MAX_STRING_LENGTH + 1, MAX_STRING_LENGTH, "Error");
 	
-	// Fehlermeldung, wenn die Inject-DLL nicht geladen werden konnte
+	// Error message: DLL loading failed
 	DWORD addrInjectError1 = 0;
 	char injectError1[MAX_STRING_LENGTH + 1] = { 0 };
 	_snprintf_s(injectError1, MAX_STRING_LENGTH + 1, MAX_STRING_LENGTH, "Couldn't load the inject DLL '%s'.\nThe program will exit now.", injectDLLPath);
 
-	// Fehlermeldung, wenn die Inject-DLL-Initialisierungsfunktion nicht aufgerufen werden konnte
+	// Error message: Initialization function call failed
 	DWORD addrInjectError2 = 0;
 	char injectError2[MAX_STRING_LENGTH + 1] = { 0 };
 	_snprintf_s(injectError2, MAX_STRING_LENGTH + 1, MAX_STRING_LENGTH, "Couldn't load the inject DLL init function '%s'.\nThe program will exit now.", injectDLLFunc);
 
-	// Kernel32-DLL laden
+	// Load kernel32.dll
 	HMODULE kernel32 = LoadLibraryA("kernel32.dll");
 
-	// Kernel32-Funktionen abrufen
+	// Get addresses of some kernel32 functions
 	FARPROC procLoadLibraryA = GetProcAddress(kernel32, "LoadLibraryA");
 	FARPROC procGetProcAddress = GetProcAddress(kernel32, "GetProcAddress");
 	FARPROC procExitProcess = GetProcAddress(kernel32, "ExitProcess");
 	FARPROC procExitThread = GetProcAddress(kernel32, "ExitThread");
 
-	// User32-DLL laden
-	// Age of Empires II lädt diese bereits von sich aus
+	// Load user32.dll
+	// It's already loaded by Age of Empires, so we don't have to load it there
 	HMODULE user32 = LoadLibraryA("user32.dll");
 
-	// User32-Funktionen abrufen
+	// Get address of MessageBox function (for error messages)
 	FARPROC procMessageBoxA = GetProcAddress(user32, "MessageBoxA");
 	
-	// Start-Adresse der Ausführung im reservierten Speicher
+	// Execution offset in reserved memory
 	DWORD addrExecBegin = 0;
 
-	// Lokal Speicher reservieren für den Patch und dann im Ziel-Prozess allokieren
+	// Reserve memory for patch and allocate it in the target process
 	LPBYTE mem = (LPBYTE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, 1024);
 	LPVOID memProcAddr = VirtualAllocEx(process, 0, 1024, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 	DWORD memProcAddrVal = PtrToUlong(memProcAddr);
 
 
-	/*** DATENBEREICH ***/
+	/*** DATA ***/
 
-	// Aktuelle Schreibeposition im reservierten Speicher
+	// Pointer for writing in our reserved memory
 	DWORD memPos = 0;
 
-	// Hilfsvariable
+	// Auxiliary variable
 	DWORD tempSize = 0;
-	
-	// Platzhalter für Handle der injizierten DLL schreiben
-	DWORD dllAddr = memProcAddrVal + memPos;
-	tempSize = 0;
-	memcpy(mem + memPos, &tempSize, 4);
-	memPos += 4;
 
-	// DLL-Name schreiben
+	// Write DLL name
 	addrInjectDLLPath = memProcAddrVal + memPos;
 	tempSize = (DWORD)strlen(injectDLLPath) + 1; // Null-Byte am Ende nicht vergessen
 	memcpy(mem + memPos, injectDLLPath, tempSize);
 	memPos += tempSize;
 
-	// DLL-Funktions-Name schreiben (Initialisierungsfunktion)
+	// Write initialization function name
 	addrInjectDLLFunc = memProcAddrVal + memPos;
 	tempSize = (DWORD)strlen(injectDLLFunc) + 1;
 	memcpy(mem + memPos, injectDLLFunc, tempSize);
 	memPos += tempSize;
 
-	// Fehlertitel schreiben
+	// Write error message title
 	addrInjectErrorTitle = memProcAddrVal + memPos;
 	tempSize = (DWORD)strlen(injectErrorTitle) + 1;
 	memcpy(mem + memPos, injectErrorTitle, tempSize);
 	memPos += tempSize;
 
-	// Fehlermeldung 1 schreiben
+	// Write error message 1
 	addrInjectError1 = memProcAddrVal + memPos;
 	tempSize = (DWORD)strlen(injectError1) + 1;
 	memcpy(mem + memPos, injectError1, tempSize);
 	memPos += tempSize;
 
-	// Fehlermeldung 2 schreiben
+	// Write error message 2
 	addrInjectError2 = memProcAddrVal + memPos;
 	tempSize = (DWORD)strlen(injectError2) + 1;
 	memcpy(mem + memPos, injectError2, tempSize);
 	memPos += tempSize;
 
-	// Ausführungs-Startadresse speichern
+	// Save code segment start
 	addrExecBegin = memProcAddrVal + memPos;
 
 
-	/*** INJECT-DLL-LADE-CODE ***/
-	// Nachfolgende Befehle sind handassembliert.
-	// Die Befehle stehen einzeln, um das ganze wartbarer und übersichtlicher zu machen.
+	/*** DLL LOAD CODE ***/
+	// The following commands are assembled by hand.
+	// They are separated from each other to keep the code clear.
 
 	// push addr
-	// -> Inject-DLL-Name für LoadLibraryA auf den Stack legen
+	// -> Push DLL name for LoadLibraryA onto the stack
 	mem[memPos++] = 0x68;
 	memcpy(mem + memPos, &addrInjectDLLPath, 4);
 	memPos += 4;
 
 	// mov eax, addr
-	// -> Adresse von LoadLibraryA in EAX legen
+	// -> Put address of LoadLibraryA into EAX
 	mem[memPos++] = 0xB8;
 	memcpy(mem + memPos, &procLoadLibraryA, 4);
 	memPos += 4;
 
 	// call eax
-	// -> LoadLibraryA aufrufen
+	// -> Call LoadLibraryA
 	mem[memPos++] = 0xFF;
 	mem[memPos++] = 0xD0;
 
-	// Fehlerprüfung => EAX ist bei Fehlern 0
+	// Error checking => When errors occur EAX will be 0
 	{
 		// cmp eax, 0
-		// -> Fehler aufgetreten?
+		// -> Are there errors?
 		mem[memPos++] = 0x83;
 		mem[memPos++] = 0xF8;
 		mem[memPos++] = 0x00;
 
 		// jnz eip+0x1E
-		// -> Fehlercode überspringen (30 Bytes)
+		// -> If not, skip error code (30 bytes)
 		mem[memPos++] = 0x75;
 		mem[memPos++] = 0x1E;
 
 		// push 0x10
-		// -> Messagebox-Icon-ID (MB_ICONHAND) auf den Stack legen
+		// -> Push message box icon ID (MB_ICONHAND) onto the stack
 		mem[memPos++] = 0x6A;
 		mem[memPos++] = 0x10;
 
 		// push addr
-		// -> Adresse vom Fehlermeldungstitel auf den Stack legen
+		// -> Push address of error message title onto the stack
 		mem[memPos++] = 0x68;
 		memcpy(mem + memPos, &addrInjectErrorTitle, 4);
 		memPos += 4;
 
 		// push addr
-		// -> Adresse vom Fehlertext auf den Stack legen
+		// -> Push address of error message onto the stack
 		mem[memPos++] = 0x68;
 		memcpy(mem + memPos, &addrInjectError1, 4);
 		memPos += 4;
 
 		// push 0
-		// -> Fensterhandle der MessageBox auf den Stack legen
+		// -> Push message box window handle onto the stack
 		mem[memPos++] = 0x6A;
 		mem[memPos++] = 0x00;
 
 		// mov eax, addr
-		// -> Adresse von MessageBoxA in EAX legen
+		// -> Put address of MessageBoxA into EAX
 		mem[memPos++] = 0xB8;
 		memcpy(mem + memPos, &procMessageBoxA, 4);
 		memPos += 4;
 
 		// call eax
-		// -> MessageBoxA aufrufen, Fehlermeldung anzeigen
+		// -> Call MessageBoxA and show error message
 		mem[memPos++] = 0xFF;
 		mem[memPos++] = 0xD0;
 		
 		// push 0
-		// -> Fehlercode für ExitProcess auf den Stack legen
+		// -> Push error code for ExitProcess onto the stack
 		mem[memPos++] = 0x6A;
 		mem[memPos++] = 0x00;
 
 		// mov eax, addr
-		// -> Adresse von ExitProcess in EAX legen
+		// -> Put address of ExitProcess into EAX
 		mem[memPos++] = 0xB8;
 		memcpy(mem + memPos, &procExitProcess, 4);
 		memPos += 4;
 
 		// call eax
-		// -> ExitProcess aufrufen, Programmende
+		// -> Call ExitProcess, end of execution
 		mem[memPos++] = 0xFF;
 		mem[memPos++] = 0xD0;
 	}
 
-	// mov [addr], eax
-	// -> Inject-DLL-Adresse in Speicher ablegen
-	mem[memPos++] = 0xA3;
-	memcpy(mem + memPos, &dllAddr, 4);
-	memPos += 4;
-
 	// push addr
-	// -> Adresse der Initialisierungsfunktion für GetProcAddress auf den Stack legen
+	// -> Push address of initialization function for GetProcAddress onto the stack
 	mem[memPos++] = 0x68;
 	memcpy(mem + memPos, &addrInjectDLLFunc, 4);
 	memPos += 4;
 
 	// push eax
-	// -> Adresse der Inject-DLL für GetProcAddress auf den Stack legen (ist noch in EAX)
+	// -> Push DLL handle onto the stack (still in EAX)
 	mem[memPos++] = 0x50;
 
 	// mov eax, addr
-	// -> Adresse von GetProcAddress in EAX legen
+	// -> Put address of GetProcAddress into EAX
 	mem[memPos++] = 0xB8;
 	memcpy(mem + memPos, &procGetProcAddress, 4);
 	memPos += 4;
 
 	// call eax
-	// -> GetProcAddress aufrufen
+	// -> Call GetProcAddress
 	mem[memPos++] = 0xFF;
 	mem[memPos++] = 0xD0;
 
-	// Fehlerprüfung => EAX ist bei Fehlern 0
+	// Error checking => When errors occur EAX will be 0
 	{
 		// cmp eax, 0
-		// -> Fehler aufgetreten?
+		// -> Are there errors?
 		mem[memPos++] = 0x83;
 		mem[memPos++] = 0xF8;
 		mem[memPos++] = 0x00;
 
-		// jnz eip+0x1C
-		// -> Fehlercode überspringen (28 Bytes)
+		// jnz eip+0x1E
+		// -> If not, skip error code (28 bytes)
 		mem[memPos++] = 0x75;
 		mem[memPos++] = 0x1C;
 
 		// push 0x10
-		// -> Messagebox-Icon-ID (MB_ICONHAND) auf den Stack legen
+		// -> Push message box icon ID (MB_ICONHAND) onto the stack
 		mem[memPos++] = 0x6A;
 		mem[memPos++] = 0x10;
 
 		// push addr
-		// -> Adresse vom Fehlermeldungstitel auf den Stack legen
+		// -> Push address of error message title onto the stack
 		mem[memPos++] = 0x68;
 		memcpy(mem + memPos, &addrInjectErrorTitle, 4);
 		memPos += 4;
 
 		// push addr
-		// -> Adresse vom Fehlertext auf den Stack legen
+		// -> Push address of error message onto the stack
 		mem[memPos++] = 0x68;
-		memcpy(mem + memPos, &addrInjectError1, 4);
+		memcpy(mem + memPos, &addrInjectError2, 4);
 		memPos += 4;
 
 		// push 0
-		// -> Fensterhandle der MessageBox auf den Stack legen
+		// -> Push message box window handle onto the stack
 		mem[memPos++] = 0x6A;
 		mem[memPos++] = 0x00;
 
 		// mov eax, addr
-		// -> Adresse von MessageBoxA in EAX legen
+		// -> Put address of MessageBoxA into EAX
 		mem[memPos++] = 0xB8;
 		memcpy(mem + memPos, &procMessageBoxA, 4);
 		memPos += 4;
 
 		// call eax
-		// -> MessageBoxA aufrufen, Fehlermeldung anzeigen
+		// -> Call MessageBoxA and show error message
 		mem[memPos++] = 0xFF;
 		mem[memPos++] = 0xD0;
 
 		// push 0
-		// -> Fehlercode für ExitProcess auf den Stack legen
+		// -> Push error code for ExitProcess onto the stack
 		mem[memPos++] = 0x6A;
 		mem[memPos++] = 0x00;
 
 		// mov eax, addr
-		// -> Adresse von ExitProcess in EAX legen
+		// -> Put address of ExitProcess into EAX
 		mem[memPos++] = 0xB8;
 		memcpy(mem + memPos, &procExitProcess, 4);
 		memPos += 4;
 	}
 
 	// call eax
-	// Je nach Wert in EAX (siehe Fehlerbehandlung):
-	// -> ExitProcess aufrufen, Programmende
-	// -> Initialisierungsfunktion aufrufen (Adresse ist in EAX, wenn kein Fehler aufgetreten ist)
+	// Depending on value of EAX (see error checking):
+	// -> Call ExitProcess, end of execution
+	// -> Call initialization function (address should be in EAX if no errors occured)
 	mem[memPos++] = 0xFF;
 	mem[memPos++] = 0xD0;
 
 	
-	/*** LADE-CODE-ENDE ***/
-	// Die Inject-DLL bleibt geladen, der Lade-Code-Thread wird beendet.
+	/*** END OF DLL LOAD CODE ***/
+	// The DLL stays loaded, the loading thread is terminated.
 
 	// push 0
-	// -> Fehlercode für ExitThread auf den Stack legen
+	// -> Push error code for ExitThread onto the stack
 	mem[memPos++] = 0x6A;
 	mem[memPos++] = 0x00;
 
 	// mov eax, addr
-	// -> Adresse von ExitThread in EAX legen
+	// -> Put address of ExitThread into EAX
 	mem[memPos++] = 0xB8;
 	memcpy(mem + memPos, &procExitThread, 4);
 	memPos += 4;
 
 	// call eax
-	// -> ExitThread aufrufen, Threadende
+	// -> Call ExitThread, end of execution
 	mem[memPos++] = 0xFF;
 	mem[memPos++] = 0xD0;
 
 
-	/*** INJECTION DES LADE-CODES ***/
+	/*** INJECT THE LOAD CODE ***/
 
-	// Page-Protection ändern, um den Patch einschleusen zu können
+	// Change page protection to inject our patch
 	DWORD pageProtectOld = 0;
 	VirtualProtectEx(process, memProcAddr, memPos, PAGE_EXECUTE_READWRITE, &pageProtectOld);
 
-	// Patch in den Prozessspeicher schreiben
+	// Write patch into process memory
 	DWORD writtenByteCount = 0;
 	WriteProcessMemory(process, memProcAddr, mem, memPos, &writtenByteCount);
 
-	// Page-Protection wiederherstellen
+	// Restore page protection
 	VirtualProtectEx(process, memProcAddr, memPos, pageProtectOld, &pageProtectOld);
 
-	// Instruction-Cache des Prozesses leeren, damit die eingeschleusten neuen Befehle auch ausgeführt werden
+	// Flush the CPU's instruction cache to make sure it'll really execute our patch
 	FlushInstructionCache(process, memProcAddr, memPos);
 
-	// Lokalen Patch-Speicher wieder freigeben
+	// Free our local patch memory
 	HeapFree(GetProcessHeap(), 0, mem);
 
-	// Lade-Code-Thread ausführen
-	// Die Start-Adresse ist die Adresse, wo der Lade-Code beginnt (addrExecBegin), davor ist ein Datenbereich!
+	// Run DLL loading thread
+	// The start address is the offset where our load code starts (addrExecBegin)
 	HANDLE loaderThread = CreateRemoteThread(process, NULL, 0, (LPTHREAD_START_ROUTINE)ULongToPtr(addrExecBegin), 0, 0, NULL);
 	
-	// Warten, bis der Lade-Code-Thread beendet ist
+	// Wait for the loading thread to exit
 	WaitForSingleObject(loaderThread, INFINITE);
 
-	// Den im Prozess allokierten Speicher wieder freigeben
+	// Free the memory allocated in the process
 	VirtualFreeEx(process, memProcAddr, 0, MEM_RELEASE);
 }

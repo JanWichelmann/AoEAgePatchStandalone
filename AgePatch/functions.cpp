@@ -1,52 +1,51 @@
 /*
---- AOE AGE PATCH :: CODECAVE-FUNKTIONEN :: IMPLEMENTIERUNG ---
+--- AOE AGE PATCH :: CODECAVE FUNCTIONS :: IMPLEMENTATION ---
 */
 
 /* INCLUDES */
 
-// Definitionsheader
+// Definition header
 #include "functions.h"
 
 
-/* FUNKTIONEN */
+/* FUNCTIONS */
 
 void CopyBytesToAddr(DWORD destAddr, void *data, size_t byteCount)
 {
-	// Page-Protection ändern, damit geschrieben werden kann
+	// Change page protection to enable writing
 	DWORD pageProtectOld = 0;
 	VirtualProtect((void *)destAddr, byteCount, PAGE_EXECUTE_READWRITE, &pageProtectOld);
 
-	// Daten kopieren
+	// Copy data
 	memcpy((void *)destAddr, data, byteCount);
 
-	// Page-Protection wiederherstellen
+	// Restore page protection
 	VirtualProtect((void *)destAddr, byteCount, pageProtectOld, &pageProtectOld);
 }
 
 void CreateCodecave(DWORD destAddr, void(*func)(void), size_t nopCount)
 {
-	// Relativen Sprung-Offset berechnen
-	// Die 5 Bytes des call-Befehls müssen berücksichtigt werden!
+	// Calculate relative jump offset excluding the 5 CALL bytes
 	DWORD callOffset = (PtrToUlong(func) - destAddr) - 5;
 	
-	// Patch für den Codecave-Aufruf erstellen:
+	// Create patch for codecave call:
 	// call relAddr
-	// -> Funktion relAddr Bytes weiter ausführen
+	// -> Call function at relAddr bytes offset
 	BYTE patch[5] = { 0xE8, 0x00, 0x00, 0x00, 0x00 }; // call relAddr
 	memcpy(patch + 1, &callOffset, sizeof(DWORD));
 	CopyBytesToAddr(destAddr, patch, 5);
 
-	// Falls NOPs gesetzt werden sollen, diese erstellen
+	// If NOPs are required, create them
 	if(nopCount > 0)
 	{
-		// Array mit nopCount Größe erstellen und mit NOP-Befehlen füllen
+		// Create array with nopCount size and fill it with NOPs
 		BYTE *nops = new BYTE[nopCount];
 		memset(nops, 0x90, nopCount);
 
-		// NOPs kopieren
+		// Copy NOP array
 		CopyBytesToAddr(destAddr + 5, nops, nopCount);
 
-		// Speicher wieder freigeben
+		// Free NOP array memory
 		delete nops;
 	}
 }

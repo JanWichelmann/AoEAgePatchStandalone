@@ -1,35 +1,35 @@
 /*
 --- AOE AGE PATCH :: PATCH CODE ---
-Semikola in Assembler-Bereichen dienen nur der korrekten Funktion der automatischen Einrückung...
-Rücksprungadressen (call-Befehl!) werden vom Stack genommen bei der Ausführung, um Zugriff auf den "Original-Stack" zu haben, d.h. es müssen nicht immer erst 4 Byte vom Stackpointer abgezogen werden.
+Semicolons in inline assembler are only for proper identation...
+Return address (CALL command!) are popped from the stack to allow access to the "original stack" so we don't have to subtract 4 bytes when we access the stack or the stack pointer.
 */
 
 
 /* INCLUDES */
 
-// Codecave-Funktionen
+// Codecave functions
 #include "functions.h"
 
 
-/* GLOBALE VARIABLEN */
+/* GLOBAL VARIABLES */
 
-// Hilfsvariable zum Löschen von Stackeinträgen.
+// Auxiliary variable to delete stack entries
 DWORD _garbage = 0;
 
-// Sprungziele
+// Assembler function addresses
 DWORD _funcUnknown1 = 0x004C05B0;
-DWORD _funcGetString = 0x00562CB0; // Ruft offenbar einen String aus den Language-DLLs ab?
-DWORD _funcFormatString = 0x0061442B; // Scheint zwei Strings mithilfe eines Formatstrings zu kombinieren?
-DWORD _funcComboBoxCreateEntry1 = 0x00550840; // Erstellt einen Eintrag in einer gegebenen ComboBox?
-DWORD _funcComboBoxCreateEntry2 = 0x00550870; // Erstellt einen Eintrag in einer gegebenen ComboBox?
+DWORD _funcGetString = 0x00562CB0;
+DWORD _funcFormatString = 0x0061442B;
+DWORD _funcComboBoxCreateEntry1 = 0x00550840;
+DWORD _funcComboBoxCreateEntry2 = 0x00550870;
 DWORD _funcUnknown2 = 0x00457F90;
-DWORD _funcFloatToInt = 0x006139E4; // Konvertiert den obersten Float in der FPU in einen Int-Wert in EAX.
+DWORD _funcFloatToInt = 0x006139E4;
 DWORD _funcUnknown3 = 0x00403996;
 DWORD _funcUnknown4 = 0x004038ED;
 DWORD _funcUnknown5 = 0x00403A2E;
 DWORD _funcUnknown6 = 0x0040244D;
 
-// Zeitalter-Konstanten
+// Age constants
 float RESEARCH_ID_DUNKEL = 105.0f;
 float RESEARCH_ID_FEUDAL = 101.0f;
 float RESEARCH_ID_RITTER = 102.0f;
@@ -37,23 +37,23 @@ float RESEARCH_ID_IMPERIAL = 103.0f;
 float RESEARCH_ID_RENAISSANCE = 104.0f;
 
 
-/* CODECAVE-FUNKTIONEN */
+/* CODECAVE FUNCTIONS */
 
-// Codecave-Funktion.
+// Codecave function.
 // 
 DWORD _retAddr_Renaissance1 = 0;
 __declspec(naked) void CC_Renaissance1()
 {
 	__asm
 	{
-		// Rücksprungadresse vom Stack holen und sichern
+		// Pop return address from the stack and save it
 		pop _retAddr_Renaissance1;
 
-		// Von Codecave überschriebene Befehle
+		// Commands overwritten by codecave call
 		movsx eax, word ptr[ebp + 0x08];
 		cmp eax, 0x65;
 
-		// Feudalzeit-Teil
+		// Feudal age
 		jne ritter;
 		push 0;
 		push 0;
@@ -65,7 +65,7 @@ __declspec(naked) void CC_Renaissance1()
 		call[_funcUnknown1];
 		jmp block1;
 
-		// Ritterzeit-Teil
+		// Castle age
 	ritter:
 		movsx eax, word ptr[ebp + 0x08];
 		cmp eax, 0x66;
@@ -80,7 +80,7 @@ __declspec(naked) void CC_Renaissance1()
 		call[_funcUnknown1];
 		jmp block1;
 
-		// Imperialzeit-Teil
+		// Imperial age
 	imperial:
 		movsx eax, word ptr[ebp + 0x08];
 		cmp eax, 0x67;
@@ -95,7 +95,7 @@ __declspec(naked) void CC_Renaissance1()
 		call[_funcUnknown1];
 		jmp block1;
 
-		// Renaissance-Teil
+		// Renaissance
 	renaissance:
 		movsx eax, word ptr[ebp + 0x08];
 		cmp eax, 0x68;
@@ -126,28 +126,28 @@ __declspec(naked) void CC_Renaissance1()
 		movsx eax, word ptr[ebp + 0x08];
 		cmp eax, 0x68;
 
-		// Rausspringen aus Codecave, dafür Zieladresse auf den Stack legen
-		je end; // Umgekehrtes JNE (an 0x00402626)
+		// Jump out of the codecave, push destination onto stack
+		je end; // Inverted JNE (at 0x00402626)
 		push 0x004026F7;
 		ret;
 
 	end:
-		// Rücksprungadresse wieder auf den Stack legen
+		// Push return address onto stack
 		push _retAddr_Renaissance1;
 
-		// Fertig
+		// Return
 		ret;
 	};
 }
 
-// Codecave-Funktion.
+// Codecave function.
 // 
 DWORD _retAddr_Renaissance2 = 0;
 __declspec(naked) void CC_Renaissance2()
 {
 	__asm
 	{
-		// Rücksprungadresse vom Stack holen und sichern
+		// Pop return address from the stack and save it
 		pop _retAddr_Renaissance2;
 
 		// Block 1
@@ -176,33 +176,33 @@ __declspec(naked) void CC_Renaissance2()
 		je end;
 		cmp ecx, 0x68;
 
-		// Rausspringen aus Codecave, dafür Zieladresse auf den Stack legen
-		je end; // Umgekehrtes JNE (an 0x005AAD8E)
+		// Jump out of the codecave, push destination onto stack
+		je end; // Inverted JNE (at 0x005AAD8E)
 		push 0x005AAEE8;
 		ret;
 
 	end:
 		mov edx, [eax];
 
-		// Rücksprungadresse wieder auf den Stack legen
+		// Push return address onto stack
 		push _retAddr_Renaissance2;
 
-		// Fertig
+		// Return
 		ret;
 	};
 }
 
-// Codecave-Funktion.
+// Codecave function.
 // 
 DWORD _retAddr_Renaissance3 = 0;
 __declspec(naked) void CC_Renaissance3()
 {
 	__asm
 	{
-		// Rücksprungadresse vom Stack holen und sichern
+		// Pop return address from the stack and save it
 		pop _retAddr_Renaissance3;
 
-		// Zeitalter-Block
+		// Age block
 		cmp ebx, 0x65;
 		je end;
 		cmp ebx, 0x66;
@@ -211,33 +211,33 @@ __declspec(naked) void CC_Renaissance3()
 		je end;
 		cmp ebx, 0x68;
 
-		// Rausspringen aus Codecave, dafür Zieladresse auf den Stack legen
-		je end; // Umgekehrtes JNE (an 0x0043FF68)
+		// Jump out of the codecave, push destination onto stack
+		je end; // Inverted JNE (an 0x0043FF68)
 		push 0x0043FFD5;
 		ret;
 
 	end:
 		mov eax, [esi + 0x00001820];
 
-		// Rücksprungadresse wieder auf den Stack legen
+		// Push return address onto stack
 		push _retAddr_Renaissance3;
 
-		// Fertig
+		// Return
 		ret;
 	};
 }
 
-// Codecave-Funktion.
+// Codecave function.
 // 
 DWORD _retAddr_Renaissance4 = 0;
 __declspec(naked) void CC_Renaissance4()
 {
 	__asm
 	{
-		// Rücksprungadresse vom Stack holen und sichern
+		// Pop return address from the stack and save it
 		pop _retAddr_Renaissance4;
 
-		// Zeitalter-Block
+		// Age block
 		cmp ebx, 0x65;
 		je block2;
 		cmp ebx, 0x66;
@@ -260,25 +260,25 @@ __declspec(naked) void CC_Renaissance4()
 	end:
 		mov ecx, esi;
 
-		// Rücksprungadresse wieder auf den Stack legen
+		// Push return address onto stack
 		push _retAddr_Renaissance4;
 
-		// Fertig
+		// Return
 		ret;
 	};
 }
 
-// Codecave-Funktion.
+// Codecave function.
 // 
 DWORD _retAddr_Renaissance5 = 0;
 __declspec(naked) void CC_Renaissance5()
 {
 	__asm
 	{
-		// Rücksprungadresse vom Stack holen und sichern
+		// Pop return address from the stack and save it
 		pop _retAddr_Renaissance5;
 
-		// Dunkle Zeit
+		// Dark age
 		cmp eax, 0;
 		jne feudal;
 		mov ecx, [esi + 0x000011BC];
@@ -286,7 +286,7 @@ __declspec(naked) void CC_Renaissance5()
 		mov eax, [ecx];
 		jmp end;
 
-		// Feudalzeit
+		// Feudal age
 	feudal:
 		cmp eax, 1;
 		jne ritter;
@@ -295,7 +295,7 @@ __declspec(naked) void CC_Renaissance5()
 		mov eax, [ecx];
 		jmp end;
 
-		// Ritterzeit
+		// Castle age
 	ritter:
 		cmp eax, 2;
 		jne imperial;
@@ -304,7 +304,7 @@ __declspec(naked) void CC_Renaissance5()
 		mov eax, [ecx];
 		jmp end;
 
-		// Imperialzeit
+		// Imperial age
 	imperial:
 		cmp eax, 3;
 		jne renaissance;
@@ -320,25 +320,25 @@ __declspec(naked) void CC_Renaissance5()
 		mov eax, [ecx];
 
 	end:
-		// Rücksprungadresse wieder auf den Stack legen
+		// Push return address onto stack
 		push _retAddr_Renaissance5;
 
-		// Fertig
+		// Return
 		ret;
 	};
 }
 
-// Codecave-Funktion.
+// Codecave function.
 // 
 DWORD _retAddr_Renaissance6 = 0;
 __declspec(naked) void CC_Renaissance6()
 {
 	__asm
 	{
-		// Rücksprungadresse vom Stack holen und sichern
+		// Pop return address from the stack and save it
 		pop _retAddr_Renaissance6;
 
-		// Sprung ausführen
+		// Perform jump
 		cmp eax, 0;
 		je dunkel;
 		cmp eax, 1;
@@ -349,7 +349,7 @@ __declspec(naked) void CC_Renaissance6()
 		je imperial;
 		jmp renaissance;
 
-		// Dunkle Zeit
+		// Dark age
 	dunkel:
 		mov eax, [esp + 0x20];
 		mov edx, [ecx];
@@ -358,7 +358,7 @@ __declspec(naked) void CC_Renaissance6()
 		push 0x00001069;
 		jmp end;
 
-		// Feudalzeit
+		// Feudal age
 	feudal:
 		mov eax, [esp + 0x20];
 		mov edx, [ecx];
@@ -367,7 +367,7 @@ __declspec(naked) void CC_Renaissance6()
 		push 0x0000106A;
 		jmp end;
 
-		// Ritterzeit
+		// Castle age
 	ritter:
 		mov eax, [esp + 0x20];
 		mov edx, [ecx];
@@ -376,7 +376,7 @@ __declspec(naked) void CC_Renaissance6()
 		push 0x0000106B;
 		jmp end;
 
-		// Imperialzeit
+		// Imperial age
 	imperial:
 		mov eax, [esp + 0x20];
 		mov edx, [ecx];
@@ -399,25 +399,25 @@ __declspec(naked) void CC_Renaissance6()
 		pop esi;
 		pop ebp;
 
-		// Rücksprungadresse wieder auf den Stack legen
+		// Push return address onto stack
 		push _retAddr_Renaissance6;
 
-		// Fertig
+		// Return
 		ret;
 	};
 }
 
-// Codecave-Funktion.
+// Codecave function.
 // 
 DWORD _retAddr_Renaissance7 = 0;
 __declspec(naked) void CC_Renaissance7()
 {
 	__asm
 	{
-		// Rücksprungadresse vom Stack holen und sichern
+		// Pop return address from the stack and save it
 		pop _retAddr_Renaissance7;
 
-		// Sprung ausführen
+		// Perform jump
 		cmp eax, 0;
 		je feudal;
 		cmp eax, 1;
@@ -426,7 +426,7 @@ __declspec(naked) void CC_Renaissance7()
 		je imperial;
 		jmp renaissance;
 
-		// Feudalzeit:
+		// Feudal age:
 	feudal:
 		mov edx, [esi];
 		push 0x0000106A;
@@ -434,7 +434,7 @@ __declspec(naked) void CC_Renaissance7()
 		call dword ptr[edx + 0x000000FC];
 		jmp end;
 
-		// Ritterzeit:
+		// Castle age:
 	ritter:
 		mov eax, [esi];
 		push 0x0000106B;
@@ -442,7 +442,7 @@ __declspec(naked) void CC_Renaissance7()
 		call dword ptr[eax + 0x000000FC];
 		jmp end;
 
-		// Imperialzeit:
+		// Imperial age:
 	imperial:
 		mov edx, [esi];
 		push 0x0000106C;
@@ -458,38 +458,38 @@ __declspec(naked) void CC_Renaissance7()
 		call dword ptr[edx + 0x000000FC];
 
 	end:
-		// Rücksprungadresse wieder auf den Stack legen
+		// Push return address onto stack
 		push _retAddr_Renaissance7;
 
-		// Fertig
+		// Return
 		ret;
 	};
 }
 
-// Codecave-Funktion.
-// Überschreibt die UserPatch-Startzeitalter-ComboBox-Änderungen.
+// Codecave function.
+// Overwrites the UserPatch ComboBox changes.
 __declspec(naked) void CC_Renaissance8()
 {
 	__asm
 	{
-		// Rücksprungadresse vom Stack holen und löschen
+		// Pop return address from the stack and save it
 		pop _garbage;
 
-		// EDI-Register sichern
+		// Save EDI register
 		push edi;
 
-		// Einträge für die einzelnen Startzeitalter generieren
+		// Generate entries for each age
 		lea edi, [esp + 0x00000148];
-		push 2; // Dunkle Zeit
+		push 2; // Dark age
 		call build_starting_age_entries;
-		push 3; // Feudalzeit
+		push 3; // Feudal age
 		call build_starting_age_entries;
-		push 4; // Ritterzeit
+		push 4; // Castle age
 		call build_starting_age_entries;
-		push 5; // Imperialzeit
+		push 5; // Imperial age
 		call build_starting_age_entries;
 
-		// EDI-Register wieder vom Stack nehmen
+		// Pop EDI register from stack
 		pop edi;
 
 		// Renaissance
@@ -498,48 +498,48 @@ __declspec(naked) void CC_Renaissance8()
 		push 0x0000106D;
 		call _funcComboBoxCreateEntry2;
 
-		// Post-Renaissance
+		// Post Renaissance
 		mov ecx, [esi + 0x00000B20];
 		push 7;
-		push 0x0000106F; // Post-Renaissance-Language-ID ist 4207
+		push 0x0000106F; // Post Renaissance language ID is 4207
 		call _funcComboBoxCreateEntry2;
 
 	end:
-		// Hinter den schon vom UserPatch übersprungen originalen Startzeitalter-Abschnitt springen
+		// Jump behind the the segment originally skipped by the UserPatch
 		push 0x005055EB;
 		ret;
 
 	build_starting_age_entries:
-		// Register sichern
+		// Save registers
 		push ebx;
 		push ebp;
 
-		// EBX ist das negierte Endzeitalter: (Maximalzeitalter - EBX) => Die Endzeitalter werden absteigend gelistet
+		// EBX is the inverted maximum age: (maximum age - EBX) => The maximum ages are sorted descending
 		xor ebx, ebx;
 
-		// Bei höchstem Zeitalter beginnen herunterzuzählen
+		// Begin with highest age, count down
 		mov ebp, 6;
 
 	build_starting_age_entries_loop:
-		// Hole Startzeitalter-String
+		// Fetch starting age string
 		mov ecx, [esp + 0x0C];
 		lea edx, [edi + 0x40];
-		lea eax, [ecx + 0x00002C63]; // Neue DLL-IDs für die Abkürzungen
+		lea eax, [ecx + 0x00002C63]; // New DLL IDs for abbrevations
 		push 0x20;
 		push edx;
 		push eax;
 		call[_funcGetString];
 
-		// Hole Endzeitalter-String
+		// Fetch maximum age string
 		mov ecx, [esp + 0x0C];
 		lea edx, [edi + 0x60];
-		lea eax, [ebp + 0x00002C63]; // Neue DLL-IDs für die Abkürzungen
+		lea eax, [ebp + 0x00002C63]; // New DLL IDs for abbrevations
 		push 0x20;
 		push edx;
 		push eax;
 		call[_funcGetString];
 
-		// Setze die beiden Strings zusammen
+		// Concat the two strings
 		lea edx, [edi + 0x60];
 		lea ecx, [edi + 0x40];
 		push edx;
@@ -551,58 +551,55 @@ __declspec(naked) void CC_Renaissance8()
 		mov edx, [esp + 0x0C];
 		mov eax, ebx;
 
-		// Linksshift der Endzeitalternummer um 3 Bits, wird dann mit dem Startzeitalter ver-OR-t
+		// Shift the maximum age number by 3 bits and OR it with the starting age number
 		shl eax, 3;
 		or al, dl;
 
-		// ComboBox-Funktion aufrufen und Eintrag einfügen
+		// Call ComboBox function and insert entry
 		push eax;
 		push edi;
 		mov ecx, [esi + 0x00000B20];
 		call[_funcComboBoxCreateEntry1];
 
-		// Startzeitalter in EAX schieben
+		// Put starting age into EAX
 		mov eax, [esp + 0x0C];
 
-		// Nächsttieferes Endzeitalter
+		// Next maximum age
 		dec ebp;
 		inc ebx;
 
-		// Fertig?
+		// Done?
 		cmp eax, ebp;
 
-		// Wieder hochspringen für das nächste Endzeitalter
+		// Jump to the top for next maximum age
 		jle build_starting_age_entries_loop;
 
-		// Funktionsende
+		// End of function
 		pop ebp;
 		pop ebx;
 		ret 4;
 	};
 }
 
-// Codecave-Funktion.
-// Überschreibt den rekursiven Startzeitalter-Aufruf, der alle Zeitalter bis zum aktuellen entwickelt.
+// Codecave function.
+// Overwrites the recursive starting age call which researches all ages up to the desired starting age.
 __declspec(naked) void CC_Renaissance10()
 {
 	__asm
 	{
-		// Ressourcen-ID abrufen
+		// Retrieve resource ID
 		mov eax, [esp + 0x04];
 		push esi;
 
-		// Von EAX 23 abziehen
+		// Subtract 23 from EAX
 		add eax, -0x17;
 		mov esi, ecx;
 
 		//cmp eax, 23;
 		//ja end2;
 
-		// Zum jeweiligen Zeitalter-Block springen
-		/*xor ecx, ecx;
-		mov cl, [eax + 0x00458188];*/
-		//jmp dword ptr[ecx * 4 + age2_x1.exe + 58170];
-		// Nachfolgende Zahlen +23 ergeben in der DAT teilweise die Zivilisations-Ressourcen-IDs für die Zeitalter-IDs
+		// Jump to corresponding age block
+		// The following numbers + 23 yield the civilization resource IDs for the age IDs
 		cmp eax, 35; // (3A)
 		je dunkle;
 		cmp eax, 2; // (19)
@@ -613,17 +610,17 @@ __declspec(naked) void CC_Renaissance10()
 		je imperial;
 		cmp eax, 16; // (27)
 		je renaissance;
-		cmp eax, 200; // (DF) => die neue Post-Renaissance ist auf 217 codiert (sollte keinen Konflikt mit existierenden Ressourcen geben)
+		cmp eax, 200; // (DF) => The new Post Renaissance is coded to 217 (there shouldn't be conflicts with existing resource IDs)
 		je post_renaissance;
 		jmp end2;
 
-		// Dunkle Zeit im Karteneditor?
+		// Dark age in map editor?
 	dunkle:
 		mov edx, [esi + 0x000000A8];
 		fld dword ptr[edx + 0x000000E8];
 		jmp end1;
 
-		// Feudalzeit
+		// Feudal age
 	feudal:
 		mov eax, [esi + 0x000000A8];
 		fld dword ptr[RESEARCH_ID_FEUDAL];
@@ -647,14 +644,14 @@ __declspec(naked) void CC_Renaissance10()
 		fld dword ptr[RESEARCH_ID_FEUDAL];
 		jmp end1;
 
-		// Ritterzeit
+		// Castle age
 	ritter:
-		// Erst Feudalzeit aufrufen
+		// First call Feudal age
 		push 0x19;
 		mov ecx, esi;
 		call CC_Renaissance10;
 
-		// Weiter
+		// Continue
 		mov ecx, [esi + 0x000000A8];
 		fld dword ptr[RESEARCH_ID_RITTER];
 		call _funcFloatToInt;
@@ -677,14 +674,14 @@ __declspec(naked) void CC_Renaissance10()
 		fld dword ptr[RESEARCH_ID_RITTER];
 		jmp end1;
 
-		// Imperialzeit
+		// Imperial age
 	imperial:
-		// Erst Ritterzeit aufrufen
+		// First call castle age
 		push 0x17;
 		mov ecx, esi;
 		call CC_Renaissance10;
 
-		// Weiter
+		// Continue
 		mov edx, [esi + 0x000000A8];
 		fld dword ptr[RESEARCH_ID_IMPERIAL];
 		call _funcFloatToInt;
@@ -709,12 +706,12 @@ __declspec(naked) void CC_Renaissance10()
 
 		// Renaissance
 	renaissance:
-		// Erst Imperialzeit aufrufen
+		// First call imperial age
 		push 0x18;
 		mov ecx, esi;
 		call CC_Renaissance10;
 
-		// Weiter
+		// Continue
 		mov edx, [esi + 0x000000A8];
 		fld dword ptr[RESEARCH_ID_RENAISSANCE];
 		call _funcFloatToInt;
@@ -736,7 +733,7 @@ __declspec(naked) void CC_Renaissance10()
 		mov edx, [esi + 0x000000A8];
 		fld dword ptr[RESEARCH_ID_RENAISSANCE];
 
-		// Ende 1
+		// End 1
 	end1:
 		call _funcFloatToInt;
 		mov ecx, [esi + 0x000012A0];
@@ -747,14 +744,14 @@ __declspec(naked) void CC_Renaissance10()
 		mov[ecx + 0x0000018C], 0x00000000;
 		ret 4;
 
-		// Post-Renaissance
+		// Post Renaissance
 	post_renaissance:
-		// Erst Renaissance aufrufen
+		// First call Renaissance
 		push 0x27;
 		mov ecx, esi;
 		call CC_Renaissance10;
 
-		// Weiter
+		// Continue
 		mov eax, [esi + 0x000000A8];
 		fld dword ptr[RESEARCH_ID_RENAISSANCE];
 		call _funcFloatToInt;
@@ -762,7 +759,7 @@ __declspec(naked) void CC_Renaissance10()
 		push eax;
 		call _funcUnknown4;
 
-		// Ende 2
+		// End 2
 	end2:
 		mov ecx, [esi + 0x000000A8];
 		pop esi;
@@ -771,16 +768,16 @@ __declspec(naked) void CC_Renaissance10()
 	};
 }
 
-// Codecave-Funktion.
-// Überschreibt den Startzeitalter-Aufruf der jeweiligen Spieler.
+// Codecave function.
+// Overwrites the playerwise starting age call.
 __declspec(naked) void CC_Renaissance9()
 {
 	__asm
 	{
-		// Rücksprungadresse vom Stack holen und löschen
+		// Pop return address from the stack and discard it
 		pop _garbage;
 
-		// Zu entsprechendem Zeitalter-Block springen
+		// Jump to corresponding age block
 		cmp eax, 0;
 		je dunkel;
 		cmp eax, 1;
@@ -795,7 +792,7 @@ __declspec(naked) void CC_Renaissance9()
 		je post_renaissance;
 		jmp end;
 
-		// Dunkle Zeit
+		// Dark age
 	dunkel:
 		cmp[ebp + 0x48], bx;
 		mov esi, ebx;
@@ -810,16 +807,16 @@ __declspec(naked) void CC_Renaissance9()
 		jnge dunkel_player;
 		jmp end;
 
-		// Feudalzeit
+		// Feudal age
 	feudal:
 		cmp[ebp + 0x48], bx;
 		mov esi, ebx;
 		jle end;
-	feudal_player: // Spieler-Schleife
+	feudal_player: // Player loop
 		mov edx, [ebp + 0x4C];
 		push 0x19;
 		mov ecx, [edx + esi * 4];
-		{ // Ehemals UserPatch-Funktion
+		{ // Formerly UserPatch function
 			push esi;
 			mov esi, ecx;
 			mov eax, [esp + 0x04];
@@ -829,7 +826,7 @@ __declspec(naked) void CC_Renaissance9()
 			call calc_max_age_id;
 			pop esi;
 
-			// Ein Objekt mehr vom Stack nehmen, wird verworfen
+			// Pop one int more from the stack and discard it
 			pop _garbage;
 		}
 		movsx eax, word ptr[ebp + 0x48];
@@ -838,16 +835,16 @@ __declspec(naked) void CC_Renaissance9()
 		jnge feudal_player;
 		jmp end;
 
-		// Ritterzeit
+		// Castle age
 	ritter:
 		cmp[ebp + 0x48], bx;
 		mov esi, ebx;
 		jle end;
-	ritter_player: // Spieler-Schleife
+	ritter_player: // Player loop
 		mov ecx, [ebp + 0x4C];
 		push 0x17;
 		mov ecx, [ecx + esi * 4];
-		{ // Ehemals UserPatch-Funktion
+		{ // Formerly UserPatch function
 			push esi;
 			mov esi, ecx;
 			mov eax, [esp + 0x04];
@@ -857,7 +854,7 @@ __declspec(naked) void CC_Renaissance9()
 			call calc_max_age_id;
 			pop esi;
 
-			// Ein Objekt mehr vom Stack nehmen, wird verworfen
+			// Pop one int more from the stack and discard it
 			pop _garbage;
 		}
 		movsx edx, word ptr[ebp + 0x48];
@@ -866,16 +863,16 @@ __declspec(naked) void CC_Renaissance9()
 		jnge ritter_player;
 		jmp end;
 
-		// Imperialzeit
+		// Imperial age
 	imperial:
 		cmp[ebp + 0x48], bx;
 		mov esi, ebx;
 		jle end;
-	imperial_player: // Spieler-Schleife
+	imperial_player: // Player loop
 		mov ecx, [ebp + 0x4C];
 		push 0x18;
 		mov ecx, [ecx + esi * 4];
-		{ // Ehemals UserPatch-Funktion
+		{ // Formerly UserPatch function
 			push esi;
 			mov esi, ecx;
 			mov eax, [esp + 0x04];
@@ -885,7 +882,7 @@ __declspec(naked) void CC_Renaissance9()
 			call calc_max_age_id;
 			pop esi;
 
-			// Ein Objekt mehr vom Stack nehmen, wird verworfen
+			// Pop one int more from the stack and discard it
 			pop _garbage;
 		}
 		movsx edx, word ptr[ebp + 0x48];
@@ -899,7 +896,7 @@ __declspec(naked) void CC_Renaissance9()
 		cmp[ebp + 0x48], bx;
 		mov esi, ebx;
 		jle end;
-	renaissance_player: // Spieler-Schleife
+	renaissance_player: // Player loop
 		mov eax, [ebp + 0x4C];
 		push 0x27;
 		mov ecx, [eax + esi * 4];
@@ -910,12 +907,12 @@ __declspec(naked) void CC_Renaissance9()
 		jnge renaissance_player;
 		jmp end;
 
-		// Post-Renaissance
+		// Post Renaissance
 	post_renaissance:
 		cmp[ebp + 0x48], bx;
 		mov esi, ebx;
 		jle end;
-	post_renaissance_player: // Spieler-Schleife
+	post_renaissance_player: // Player loop
 		mov edx, [ebp + 0x4C];
 		push 0xDF;
 		mov ecx, [edx + esi * 4];
@@ -926,14 +923,15 @@ __declspec(naked) void CC_Renaissance9()
 		jnge post_renaissance_player;
 		jmp end;
 
-		// Berechnet die Technologie-ID des Endzeitalters.
+		// Calculates the technology ID of the maximum age.
 	calc_max_age_id:
-		mov edx, [0x7912A0];
+		xor edx, edx; // Workaround because the compiler messes up MOV with constant address...
+		mov edx, [edx + 0x007912A0];
 		mov eax, [edx + 0x00001440];
 		shr eax, 3;
 		test eax, eax;
 		je calc_max_age_id_end;
-		mov edx, 105; // Höchstmögliche Zeitalter-ID
+		mov edx, 105; // Maximum possible age ID
 		sub edx, eax;
 		push 0;
 		push edx;
@@ -942,27 +940,27 @@ __declspec(naked) void CC_Renaissance9()
 		ret;
 
 	end:
-		// Hinter die überschriebene Funktion springen, spart NOPs und ist schneller
+		// Jump behind the overwritten function to save NOPs and improve performance
 		push 0x0042A7BF;
 		ret;
 	};
 }
 
-// Codecave-Funktion.
-// Überschreibt den Zeitalter-Aufruf beim "Test"-Button des Karteneditors.
+// Codecave function.
+// Overwrites the starting age call when the map editors "Test" button ist clicked.
 DWORD _retAddr_Renaissance11 = 0;
 __declspec(naked) void CC_Renaissance11()
 {
 	__asm
 	{
-		// Rücksprungadresse vom Stack holen und sichern
+		// Pop return address from the stack and save it
 		pop _retAddr_Renaissance11;
 
-		// Zeitalter-Zahl abgleichen
+		// Compare age number
 		cmp eax, 4;
 		ja end;
 
-		// Sprung ausführen
+		// Perform jump
 		cmp eax, 0;
 		je feudal;
 		cmp eax, 1;
@@ -973,17 +971,17 @@ __declspec(naked) void CC_Renaissance11()
 		je renaissance;
 		jmp post_renaissance;
 
-		// Feudalzeit
+		// Feudal age
 	feudal:
 		push 0x19;
 		jmp age_call;
 
-		// Ritterzeit
+		// Castle age
 	ritter:
 		push 0x17;
 		jmp age_call;
 
-		// Imperialzeit
+		// Imperial age
 	imperial:
 		push 0x18;
 		jmp age_call;
@@ -993,39 +991,39 @@ __declspec(naked) void CC_Renaissance11()
 		push 0x27;
 		jmp age_call;
 
-		// Post-Renaissance
+		// Post Renaissance
 	post_renaissance:
 		push 0xDF;
 
 	age_call:
-		// Aufruf durchführen
+		// Perform call
 		mov ecx, edi;
 		call CC_Renaissance10;
 
 	end:
-		// Rücksprungadresse wieder auf den Stack legen
+		// Push return address onto stack
 		push _retAddr_Renaissance11;
 
-		// Fertig
+		// Return
 		ret;
 	};
 }
 
-// Codecave-Funktion.
-// Überschreibt den Zeitalter-Aufruf beim Verstellen des Startzeitalters im Karteneditor.
+// Codecave function.
+// Overwrites the starting age call when changing the starting age in the map editor.
 DWORD _retAddr_Renaissance12 = 0;
 __declspec(naked) void CC_Renaissance12()
 {
 	__asm
 	{
-		// Rücksprungadresse vom Stack holen und sichern
+		// Pop return address from the stack and save it
 		pop _retAddr_Renaissance12;
 
-		// Zeitalter-Zahl abgleichen
+		// Compare age number
 		cmp esi, 5;
 		ja end;
 
-		// Sprung ausführen
+		// Perform jump
 		cmp esi, 0;
 		je dunkel;
 		cmp esi, 1;
@@ -1038,22 +1036,22 @@ __declspec(naked) void CC_Renaissance12()
 		je renaissance;
 		jmp post_renaissance;
 
-		// Dunkle Zeit
+		// Dark age
 	dunkel:
 		push 0x3A;
 		jmp age_call;
 
-		// Feudalzeit
+		// Feudal age
 	feudal:
 		push 0x19;
 		jmp age_call;
 
-		// Ritterzeit
+		// Castle age
 	ritter:
 		push 0x17;
 		jmp age_call;
 
-		// Imperialzeit
+		// Imperial age
 	imperial:
 		push 0x18;
 		jmp age_call;
@@ -1063,55 +1061,55 @@ __declspec(naked) void CC_Renaissance12()
 		push 0x27;
 		jmp age_call;
 
-		// Post-Renaissance
+		// Post Renaissance
 	post_renaissance:
 		push 0xDF;
 
 	age_call:
-		// Aufruf durchführen
+		// Perform call
 		mov ecx, edi;
 		call CC_Renaissance10;
 
 	end:
 		mov eax, [edi + 0x78];
 
-		// Rücksprungadresse wieder auf den Stack legen
+		// Push return address onto stack
 		push _retAddr_Renaissance12;
 
-		// Fertig
+		// Return
 		ret;
 	};
 }
 
-// Codecave-Funktion.
-// Überschreibt den Zeitalter-Aufruf beim Verstellen des Startzeitalters im Karteneditor.
+// Codecave function.
+// Overwrites the starting age call when changing the starting age in the map editor.
 DWORD _retAddr_Renaissance13 = 0;
 __declspec(naked) void CC_Renaissance13()
 {
 	__asm
 	{
-		// Rücksprungadresse vom Stack holen und sichern
+		// Pop return address from the stack and save it
 		pop _retAddr_Renaissance13;
 
-		// Dunkle Zeit
+		// Dark age
 		mov ecx, [esi + 0x00000A34];
 		push 2;
 		push 0x00001069;
 		call _funcComboBoxCreateEntry2;
 
-		// Feudalzeit
+		// Feudal age
 		mov ecx, [esi + 0x00000A34];
 		push 3;
 		push 0x0000106A;
 		call _funcComboBoxCreateEntry2;
 
-		// Ritterzeit
+		// Castle age
 		mov ecx, [esi + 0x00000A34];
 		push 4;
 		push 0x0000106B;
 		call _funcComboBoxCreateEntry2;
 
-		// Imperialzeit
+		// Imperial age
 		mov ecx, [esi + 0x00000A34];
 		push 5;
 		push 0x0000106C;
@@ -1123,38 +1121,38 @@ __declspec(naked) void CC_Renaissance13()
 		push 0x0000106D;
 		call _funcComboBoxCreateEntry2;
 
-		// Post-Renaissance
+		// Post Renaissance
 		mov ecx, [esi + 0x00000A34];
 		push 7;
 		push 0x0000106F;
 		call _funcComboBoxCreateEntry2;
 
-		// Rücksprungadresse wieder auf den Stack legen
+		// Push return address onto stack
 		push _retAddr_Renaissance13;
 
-		// Fertig
+		// Return
 		ret;
 	};
 }
 
-/* DLL-FUNKTIONEN */
+/* DLL FUNCTION */
 
-// DLL-Einstiegspunkt.
+// DLL entry point.
 int WINAPI DllMain(HMODULE hModule, DWORD ulReason, LPVOID lpReserved)
 {
-	// DLL-Thread-Messages unterbinden
+	// Disable DLL thread messages
 	if(ulReason == DLL_PROCESS_ATTACH)
 		DisableThreadLibraryCalls(hModule);
 
-	// Immer laden
+	// Always load
 	return TRUE;
 }
 
-// Initialisierungsfunktion.
-// Initialisiert die Codecaves und führt weitere Änderungen im logischen Speicher durch.
+// Initialization function.
+// Initializes the codecaves and performs some additional changes in the logical memory.
 extern "C" __declspec(dllexport) void Init()
 {
-	// Codecaves erstellen
+	// Create Codecaves
 	CreateCodecave(0x0040259A, CC_Renaissance1, 141);
 	CreateCodecave(0x005AAD61, CC_Renaissance2, 48);
 	CreateCodecave(0x0043FF59, CC_Renaissance3, 16);
@@ -1168,7 +1166,7 @@ extern "C" __declspec(dllexport) void Init()
 	CreateCodecave(0x004DFE40, CC_Renaissance12, 35);
 	CreateCodecave(0x004ED2CE, CC_Renaissance13, 85);
 
-	// 457FC0 ist in die Renaissance-Codecave 10 gewandert
+	// The function 0x00457FC0 was moved into Renaissance codecave 10
 	CreateCodecave(0x00427291, CC_Renaissance10, 0);
 	CreateCodecave(0x004272A4, CC_Renaissance10, 0);
 	CreateCodecave(0x004272B7, CC_Renaissance10, 0);
@@ -1178,16 +1176,16 @@ extern "C" __declspec(dllexport) void Init()
 	CreateCodecave(0x00429C15, CC_Renaissance10, 0);
 	CreateCodecave(0x007D8E8A, CC_Renaissance10, 0);
 
-	// Renaissance-Mini-Patches
+	// Renaissance mini patches
 	{
-		// Dunkle Zeit-ID ändern
+		// Change ID of dark age
 		BYTE patch1[1] = { 0x69 };
 		CopyBytesToAddr(0x0040265F, patch1, 1);
 		CopyBytesToAddr(0x00402689, patch1, 1);
 		CopyBytesToAddr(0x004026B2, patch1, 1);
 		CopyBytesToAddr(0x004026DB, patch1, 1);
 
-		// Renaissance-ID einbeziehen
+		// Include Renaissance ID
 		patch1[0] = 0x68;
 		CopyBytesToAddr(0x0040282C, patch1, 1);
 		CopyBytesToAddr(0x00402B07, patch1, 1);
@@ -1195,28 +1193,26 @@ extern "C" __declspec(dllexport) void Init()
 		CopyBytesToAddr(0x0040313E, patch1, 1);
 		CopyBytesToAddr(0x004864F5, patch1, 1);
 
-		// Zeitalter-Anzahl ändern
+		// Change age count
 		patch1[0] = 0x04;
 		CopyBytesToAddr(0x0051FF2E, patch1, 1);
 		CopyBytesToAddr(0x0043D04A, patch1, 1);
 
-		// Zeitalter-Anzahl ändern
+		// Change age count
 		patch1[0] = 0x05;
 		CopyBytesToAddr(0x0042A733, patch1, 1);
 
-		// Zeitalter-Civ-Ressourcen-IDs ändern
-		patch1[0] = 0xDF; // Post-Renaissance
+		// Change civilization age number resources
+		patch1[0] = 0xDF; // Post Renaissance
 		CopyBytesToAddr(0x00429A3D, patch1, 1);
 		CopyBytesToAddr(0x00429AC6, patch1, 1);
 		CopyBytesToAddr(0x00429C11, patch1, 1);
 
-		// TODO: Endzeitalter-KI-Konstante hinzufügen bei 0x007AF140
+		// TODO: Add AI maximum age constant for Renaissance at 0x007AF140
 	}
 
-	// Neue ID für die Einsaat-Warteschleife-Meldung (Kollision mit Renaissance-Meldung)
+	// New ID for field sowing message (collosion with Renaissance advancement message)
 	BYTE patch[2] = { 0x0A, 0x0C };
 	CopyBytesToAddr(0x00529A76, patch, 2);
-
-	// TODO: Einzelne Memory-Patches bei 2667+ (90er-Werte)?
 }
 

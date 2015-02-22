@@ -1,31 +1,31 @@
 #pragma once
 /*
---- AOE AGE PATCH :: CODECAVE-FUNKTIONEN :: DEFINITIONEN ---
+--- AOE AGE PATCH :: CODECAVE FUNCTIONS :: DEFINITIONS ---
 */
 
 /* INCLUDES */
 
-// Windows-Funktionen
+// Windows definitions
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-// C-Standard-I/O-Funktionen
+// C standard I/O functions
 #include <cstdio>
 
 
-/* DEFINITIONEN */
+/* DEFINITIONS */
 
-// Erstellt an der angegebenen Zieladresse einen Aufruf für die gegebene Codecave-Funktion.
-// Optional können danach mehrere NOPs (No-Operation) eingefügt werden, um ggf. zerstörte Befehle zu überschreiben.
-// Parameter:
-// -> destAddr: Die Adresse, an der Sprung eingefügt werden soll.
-// -> func: Die auszuführende Codecave-Funktion.
-// -> nopCount: Die Anzahl der einzufügenden NOPs nach den 5 CALL-Bytes.
+// Creates a call for the given codecave function at the given destination address.
+// Optionally after the call several NOPs can be inserted to overwrite damaged opcodes / functions.
+// Parameters:
+// -> destAddr: The address where the codecave call should be performed.
+// -> func: The codecave function to be called.
+// -> nopCount: The count of the NOPs to be inserted after the 5 CALL bytes.
 void CreateCodecave(DWORD destAddr, void(*func)(void), size_t nopCount);
 
-// Kopiert die angegeben Daten an eine Zieladresse.
-// Parameter:
-// -> destAddr: Die Zieladresse, an die die Daten kopiert werden sollen.
-// -> data: Der Pointer auf die zu kopierenden Daten.
-// -> byteCount: Die Länge der zu kopierenden Daten (Anzahl Bytes).
+// Copies the given data to a given address.
+// Parameters:
+// -> destAddr: The address where the data should be copied to.
+// -> data: The pointer to the data.
+// -> byteCount: The length of the data to be copied (byte count).
 void CopyBytesToAddr(DWORD destAddr, void *data, size_t byteCount);

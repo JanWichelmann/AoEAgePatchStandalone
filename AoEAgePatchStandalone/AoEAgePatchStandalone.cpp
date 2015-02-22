@@ -4,62 +4,62 @@
 
 /* INCLUDES */
 
-// Windows-Funktionen
+// Windows definitions
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-// C-Standard-input/Output-Funktionen
+// C standard I/O functions
 #include <cstdio>
 
-// __argc, __argv-Variablen für das Befehlszeilen-Parsing
+// __argc, __argv-Variablen for command line parsing
 #include <cstdlib>
 
-// C++-String-Funktionen
+// C++ string functions
 #include <string>
 
-// Injection-Funktionen
+// Injecton functions
 #include "injection.h"
 
 
-/* FUNKTIONEN */
+/* FUNCTIONS */
 
-// Programm-Einstiegsfunktion.
+// Application entry point.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int cmdShow)
 {
-	// Pfad zum Arbeitsverzeichnis ist der aktuelle Ordner
-	// Der String hat MAX_STRING_LENGTH-Länge, um bei den Ladefunktionen einfacher kopiert werden zu können
+	// The current folder is our working directory
+	// The string has a length of MAX_STRING_LENGTH for simply copying later
 	char workdir[MAX_STRING_LENGTH + 1] = { 0 };
 	GetCurrentDirectory(MAX_STRING_LENGTH, workdir);
 
-	// Pfad zur EXE
+	// Path to our executable
 	char exepath[MAX_STRING_LENGTH + 1] = { 0 };
 
-	// Parameter für die EXE
+	// Parse executable parameters
 	std::string cmdLine("age2_x1.exe game=X2AddOn_1 nostartup");
 	if(__argc > 1)
 		cmdLine = std::string("");
 	for(int i = 1; i < __argc; ++i)
 	{
-		// Parameter-String zusammensetzen
+		// Concat parameter string
 		cmdLine.append(__argv[i]).append(" ");
 	}
 
-	// EXE-Parameter mit Pfad verknüpfen
-	// nostartup: Keine Videos am Anfang
+	// Combine path and parameters
+	// nostartup: Disable startup videos
 	_snprintf_s(exepath, MAX_STRING_LENGTH, MAX_STRING_LENGTH, "%s\\%s", workdir, cmdLine);
 
-	// Pfad zur DLL
+	// DLL path
 	char dllpath[MAX_STRING_LENGTH + 1] = { 0 };
 	_snprintf_s(dllpath, MAX_STRING_LENGTH, MAX_STRING_LENGTH, "AgePatch.dll");
 	
-	// Prozessstart-Variablen
+	// Variables for process startup
 	STARTUPINFO si = { sizeof(STARTUPINFO) };
 	PROCESS_INFORMATION pi = { 0 };
 
-	// Größe der STARTUPINFO-Struktur übergeben
+	// Pass size of STARTUPINFO structure
 	si.cb = sizeof(STARTUPINFO);
 
-	// EXE starten, aber noch nicht ausführen (suspend)
+	// Run EXE, but suspend immediately
 	int res = CreateProcess(NULL, exepath, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, workdir, &si, &pi);
 	if(res == 0)
 	{
@@ -70,13 +70,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLin
 		return -1;
 	}
 
-	// DLL-Injection durchführen
+	// Perform DLL injection
 	InjectDLL(pi.hProcess, dllpath, "Init");
 	
-	// Prozess-Ausführung beginnen
+	// Resume EXE
 	ResumeThread(pi.hThread);
 
-	// Alles gut
+	// Exit loader
 	return 0;
 }
 
