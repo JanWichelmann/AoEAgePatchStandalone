@@ -1197,6 +1197,7 @@ extern "C" __declspec(dllexport) void Init()
 		patch1[0] = 0x04;
 		CopyBytesToAddr(0x0051FF2E, patch1, 1);
 		CopyBytesToAddr(0x0043D04A, patch1, 1);
+		CopyBytesToAddr(0x005280D9, patch1, 1);
 
 		// Change age count
 		patch1[0] = 0x05;
