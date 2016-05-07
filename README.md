@@ -30,7 +30,7 @@ Also some virus scanners may have problems with this software, as it uses DLL in
 
 To use this patch you'll have to ensure the following things (example: new age "Renaissance"):
 
--> LANGUAGE.DLL IDs
+__LANGUAGE.DLL IDs__
 - #4205: The title of the new age (e.g. "Renaissance")
 - #4207: The title of the new post-age (e.g. "Post-Renaissance")
 - #7104: The title of the new age (e.g. "Renaissance")
@@ -41,11 +41,11 @@ To use this patch you'll have to ensure the following things (example: new age "
 - #11368: The abbreviation of imperial age for "starting age - maximum age" selection (e.g. "Imperial")
 - #11369: The abbreviation of your new age for "starting age - maximum age" selection (e.g. "Renaissance")
 
--> language_x1.dll IDs
+__language_x1.dll IDs__
 - #3039: The age advancement message for your new age with '%s' player name parameter (e.g. "%s advanced to the Renaissance.")
 - #3082: The 'reseed farm queue is full' message (I had to move it from #3039 to #3082)
 
--> empires2_x1_p1.dat IDs
+__empires2_x1_p1.dat IDs__
 - The dark age has to be moved to research ID #105 (do not forget to update the related researches like "Loom" to the new ID!)
 - Your new age has to replace the dark age on ID #104
 
