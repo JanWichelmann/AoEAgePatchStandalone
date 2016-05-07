@@ -1,8 +1,13 @@
-This launcher starts the age2_x1.exe process and injects the AgePatch.dll containing the code changes to add a new age.
-I created this software while working on the (german) Agearena AddOn (http://www.agearena.de/forum/index.php?mode=viewforum&forum_id=7) and will update it periodically.
+## OVERVIEW
+
+This patch (contained in the AgePatch.dll) enables a fifth "real" age, while moving the "post *" age to the next available ID. It is fully researchable and behaves the same as the original four ages (in singleplayer and multiplayer mode), except for the tech tree (see below).
+
+The launcher starts the age2_x1.exe process and injects the AgePatch.dll. If you want to load it statically (i.e. by inserting the load code into the EXE file itself), you can find the required assembler commands in the injection.h code file.
+
+I created this software while working on the (german) Agearena AddOn (http://www.agearena.de/forum/index.php?mode=viewforum&forum_id=7). There are no known bugs by now, so this release is considered stable.
 
 
--- USAGE --
+## USAGE
 
 > AoEAgePatchStandalone.exe PARAMS
 
@@ -12,7 +17,7 @@ For mod developers using their own Games/[MODNAME] subfolder, the call may be:
 > AoEAgePatchStandalone.exe age2_x1.exe game=[MODNAME] nostartup
 
 
--- SYSTEM REQUIREMENTS --
+## SYSTEM REQUIREMENTS
 
 As this software is build with Microsoft Visual Studio 2013, you'll need the appropiate Visual C++ redistributable: http://www.microsoft.com/en-us/download/details.aspx?id=40784
 
@@ -21,7 +26,7 @@ This software overwrites some routines the UserPatch v1.4 creates, so that is re
 Also some virus scanners may have problems with this software, as it uses DLL injection to patch the running Age of Empires II process. This method is also used by many viruses, so some virus scanners block it by default. If you have problems running this software, try to create an exception in the scanners filter rules.
 
 
--- IMPORTANT INFORMATION FOR MOD DEVELOPERS --
+## IMPORTANT INFORMATION FOR MOD DEVELOPERS
 
 To use this patch you'll have to ensure the following things (example: new age "Renaissance"):
 
@@ -44,15 +49,17 @@ To use this patch you'll have to ensure the following things (example: new age "
 - The dark age has to be moved to research ID #105 (do not forget to update the related researches like "Loom" to the new ID!)
 - Your new age has to replace the dark age on ID #104
 
-When you considered these changes, it should work fine. If I forgot something, contact me :D
+When you considered these changes, it should work fine. If I forgot something, contact me :D   
+I misused this forum thread for supporting the library: http://aok.heavengames.com/cgi-bin/forums/display.cgi?action=ct&f=9,43926,,all    
+Feel free to post there. Maybe I will add an official download entry there later.
 
 
--- TODO --
+## MISSING FEATURES
 
-The patches aren't perfect yet: The techtree functions aren't changed, and there may still be a few bugs. These features probably will be added in some time.
+The patches aren't perfect: The techtree functions aren't changed, as there are very many hardcoded sections; changes would probably break them. Please consider using my tech tree replacement (https://github.com/Janworks/AoETechTree) instead.
 
 
--- LEGAL INFO & CREDITS --
+## LEGAL INFO & CREDITS
 
 This software is published under the MIT/X11 license. Please read the LICENSE for further information.
 
